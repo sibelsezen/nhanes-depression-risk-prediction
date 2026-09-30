@@ -1,0 +1,20 @@
+{
+    "model_name": "NHANES Elevated Depression Risk Screening Model",
+    "algorithm": "Class-balanced logistic regression",
+    "number_of_predictors": 27,
+    "removed_predictors": [
+        "BMXBMI",
+        "BMXWAIST"
+    ],
+    "prediction_threshold": 0.4704,
+    "target_column": "elevated_depression_risk",
+    "training_records": 4054,
+    "test_records": 1014,
+    "test_roc_auc": 0.7923,
+    "test_pr_auc": 0.2888,
+    "test_recall_sensitivity": 0.6739,
+    "test_specificity": 0.743,
+    "test_precision": 0.2074,
+    "test_f1": 0.3171,
+    "scikit_learn_version": "1.9.1"
+}
