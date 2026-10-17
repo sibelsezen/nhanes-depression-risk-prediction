@@ -1,0 +1,4 @@
+finalist_rank,model,roc_auc,recall,f2,cv_pr_auc,cv_std,overfitting_gap,threshold
+1,Gradient Boosting,0.8124,0.7139,0.5155,0.3021,0.0295,0.0285,0.3154
+2,CatBoost,0.8117,0.7602,0.5131,0.3035,0.0259,0.0445,0.0968
+3,Logistic Regression,0.8082,0.7847,0.5099,0.303,0.0259,0.0265,0.4369

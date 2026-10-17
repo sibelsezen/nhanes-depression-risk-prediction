@@ -1,0 +1,13 @@
+metric,value
+ROC-AUC,0.7912088559841556
+PR-AUC,0.31023647611143323
+Balanced accuracy,0.7072998208054324
+Precision,0.22568093385214008
+Recall,0.6304347826086957
+Specificity,0.7841648590021691
+F1,0.332378223495702
+F2,0.464
+True negatives,723.0
+False positives,199.0
+False negatives,34.0
+True positives,58.0
