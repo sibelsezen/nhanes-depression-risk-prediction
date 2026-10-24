@@ -98,6 +98,8 @@ The test set contained 92 positive cases. The model identified 70 of them and mi
 nhanes-depression-risk-prediction/
 ├── app.py
 ├── requirements.txt
+├── requirements-modeling.txt
+├── MODEL_CARD.md
 ├── README.md
 ├── LICENSE
 ├── data/
@@ -113,12 +115,13 @@ nhanes-depression-risk-prediction/
 │   ├── 01_data_collection.ipynb
 │   ├── 02_data_preprocessing.ipynb
 │   ├── 03_exploratory_data_analysis.ipynb
-│   └── 04_model_development.ipynb
+│   ├── 04_model_development.ipynb
+│   └── 04_model_development_revised.ipynb
 └── reports/
     └── figures/
 ```
 
-Large or generated datasets are not stored in the repository. Run the notebooks in numerical order to reproduce the analysis.
+Large or generated datasets are not stored in the repository. Run the first three notebooks in numerical order, then use `04_model_development_revised.ipynb` as the authoritative final modeling notebook. The original `04_model_development.ipynb` is retained only for development history.
 
 ## Run Locally
 
@@ -133,6 +136,14 @@ python3 -m streamlit run app.py
 ```
 
 The application loads the complete saved pipeline, gathers all 29 inputs, calculates the positive-class probability, and applies the saved threshold of 0.4125.
+
+To reproduce the full modeling notebook, install the additional pinned packages:
+
+```bash
+python3 -m pip install -r requirements-modeling.txt
+```
+
+See [MODEL_CARD.md](MODEL_CARD.md) for intended use, evaluation details, and limitations.
 
 ## AWS Deployment
 
