@@ -1,0 +1,2 @@
+model,dataset,threshold,recall,roc_auc,specificity,balanced_accuracy,precision,f1,f2,pr_auc,actual_positive_cases,predicted_positive_cases,true_positives,false_negatives,true_negatives,false_positives
+Logistic Regression,Untouched test set,0.4125,0.7609,0.7866,0.7017,0.7313,0.2029,0.3204,0.4909,0.2862,92,345,70,22,647,275
