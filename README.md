@@ -1,77 +1,96 @@
 # NHANES Depression Risk Prediction
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Live%20App-FF4B4B.svg)](https://nhanes-depression-risk.streamlit.app)
+[![Streamlit](https://img.shields.io/badge/Streamlit-AWS%20EC2-FF4B4B.svg)](http://3.144.190.201:8501)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An end-to-end machine-learning project that estimates elevated depressive-symptom risk using publicly available health, demographic, sleep, physical-activity, smoking, and alcohol-use data from the CDC National Health and Nutrition Examination Survey (NHANES) 2017–2018 cycle.
+An end-to-end machine-learning project that estimates elevated depressive-symptom risk using health, demographic, sleep, physical-activity, smoking, and alcohol-use data from the CDC National Health and Nutrition Examination Survey (NHANES) 2017–2018 cycle.
 
-**Live application:** [NHANES Depression Risk Screening Tool](https://nhanes-depression-risk.streamlit.app)
+**Live AWS application:** [NHANES Depression Risk Screening Tool](http://3.144.190.201:8501)
 
-> **Important:** This project is for educational and screening-demonstration purposes only. It is not a medical diagnosis tool and must not be used to make clinical decisions.
+> **Important:** This project is an educational screening demonstration. It is not a diagnostic or clinical decision-making tool.
 
-## Project Overview
+## Project Goal
 
-Depression is an important public-health concern, but elevated risk can be difficult to identify from any single health or lifestyle measure. This project builds a reproducible binary-classification workflow that:
-
-1. Collects and combines relevant NHANES 2017–2018 files.
-2. Cleans the data and engineers analysis-ready health and lifestyle features.
-3. Explores class balance, distributions, group differences, and correlations.
-4. Compares multiple classification models using stratified cross-validation.
-5. Tunes the strongest candidate without using the test set.
-6. Selects a screening threshold from out-of-fold predictions.
-7. Evaluates the final model once on an untouched holdout test set.
-8. Deploys the saved pipeline as an interactive Streamlit application.
+The goal is to compare multiple classification algorithms fairly and select a model that can identify participants with elevated depressive-symptom risk. Because only 9.06% of participants belong to the positive class, the project prioritizes **recall** and uses **ROC-AUC** as a secondary discrimination metric. Ordinary accuracy is not used for model selection.
 
 ## Dataset
 
-- **Source:** CDC/NCHS National Health and Nutrition Examination Survey (NHANES)
+- **Source:** CDC/NCHS NHANES
 - **Cycle:** 2017–2018
-- **Final analytic sample:** 5,068 participants
-- **Candidate predictors:** 29
-- **Final model predictors:** 27
+- **Analytic sample:** 5,068 participants
+- **Predictors:** 29
 - **Elevated-risk cases:** 459 (9.06%)
 - **Target:** Binary elevated depressive-symptom risk derived from the NHANES depression screener
+- **Split:** Stratified 80% training / 20% untouched test
 
-The project keeps participant identifiers separate from the modeling matrix and checks for duplicate IDs, missing target values, predictor leakage, and train/test alignment.
+Participant identifiers are excluded from the predictor matrix. The workflow also checks duplicate IDs, missing target values, predictor leakage, and train/test alignment.
 
-## Modeling Approach
+## Models Compared
 
-The positive class represents only 9.06% of the analytic sample, so accuracy alone would be misleading. Model selection therefore emphasized:
+Ten real classification models were developed and compared:
 
-- Balanced accuracy
-- Recall/sensitivity
-- Precision
-- F1 score
-- ROC-AUC
-- PR-AUC
+1. Logistic Regression
+2. Support Vector Machine
+3. Decision Tree
+4. Random Forest
+5. AdaBoost
+6. Gradient Boosting
+7. XGBoost
+8. CatBoost
+9. LightGBM
+10. Histogram Gradient Boosting
 
-The evaluated candidates included:
+A Dummy Classifier is not included in the final computation table.
 
-- Dummy classifier
-- Class-balanced logistic regression
-- Random forest
-- Histogram gradient boosting
+## Modeling Strategy
 
-The final model is a **class-balanced logistic regression** with L2 regularization and `C = 0.5`. BMI and waist circumference were removed from the final feature set after correlated-feature analysis. The probability threshold was selected from out-of-fold training predictions; the holdout test set was not used during tuning or threshold selection.
+All model development is performed on the training set. The test set remains untouched until the final model is selected.
 
-## Final Test Performance
+- Numeric variables are imputed and scaled; scaling is especially important for Logistic Regression and SVM.
+- Categorical variables are imputed and one-hot encoded.
+- Preprocessing is fitted inside each cross-validation fold to prevent leakage.
+- Stratified five-fold cross-validation preserves the minority-class proportion.
+- Class weights are used as the main imbalance treatment.
+- SMOTE is evaluated as a training-only alternative inside an imbalanced-learn pipeline.
+- Hyperparameters are tuned using cross-validation.
+- Regularized versions of complex models are evaluated to reduce overfitting.
+- Feature importance and feature-selection experiments are examined, while the final survey retains all 29 predictors because reducing the feature set did not materially improve performance.
+- Each model receives its own threshold selected from out-of-fold training probabilities by maximizing F2, which weights recall more heavily than precision.
+- Models are compared only after initial, tuned, imbalance-handled, and overfitting checks are complete.
 
-The final pipeline was evaluated once on the untouched test set of 1,014 participants.
+## Final Model Selection
+
+The selected model is **tuned Logistic Regression with balanced class weights**.
+
+| Selection result | Value |
+|---|---:|
+| Out-of-fold recall | 0.8038 |
+| Out-of-fold ROC-AUC | 0.8077 |
+| Out-of-fold specificity | 0.6922 |
+| Out-of-fold balanced accuracy | 0.7480 |
+| Selected probability threshold | 0.4125 |
+| Overfitting assessment | No meaningful overfitting |
+
+Logistic Regression was selected because it produced the highest recall among models that passed the project guardrails, maintained competitive ROC-AUC, showed stable validation behavior, and remained interpretable for a screening-oriented application.
+
+## Untouched Test Performance
+
+The final pipeline was evaluated once on 1,014 previously unseen participants.
 
 | Metric | Result |
 |---|---:|
-| Accuracy | 0.7367 |
-| Balanced accuracy | 0.7084 |
-| Precision | 0.2074 |
-| Recall / sensitivity | 0.6739 |
-| Specificity | 0.7430 |
-| F1 score | 0.3171 |
-| ROC-AUC | 0.7923 |
-| PR-AUC | 0.2888 |
-| Selected probability threshold | 0.4704 |
+| Recall / sensitivity | 0.7609 |
+| ROC-AUC | 0.7866 |
+| Specificity | 0.7017 |
+| Balanced accuracy | 0.7313 |
+| Precision | 0.2029 |
+| F1 score | 0.3204 |
+| F2 score | 0.4909 |
+| PR-AUC | 0.2862 |
+| Probability threshold | 0.4125 |
 
-At the selected screening threshold, the model identified approximately 67% of elevated-risk cases in the holdout sample. Precision is lower because the positive class is uncommon and the threshold intentionally favors sensitivity for screening-oriented use.
+The test set contained 92 positive cases. The model identified 70 of them and missed 22. Its lower precision is expected in a low-prevalence screening setting where the selected threshold deliberately favors sensitivity.
 
 ## Repository Structure
 
@@ -83,8 +102,10 @@ nhanes-depression-risk-prediction/
 ├── LICENSE
 ├── data/
 │   ├── raw/
-│   ├── interim/
 │   └── processed/
+├── deployment/
+│   ├── README.md
+│   └── nhanes-streamlit.service
 ├── models/
 │   ├── final_depression_risk_model.joblib
 │   └── final_model_metadata.json
@@ -97,86 +118,53 @@ nhanes-depression-risk-prediction/
     └── figures/
 ```
 
-Large or generated datasets are not stored in the repository. Run the notebooks in numerical order to reproduce them locally.
+Large or generated datasets are not stored in the repository. Run the notebooks in numerical order to reproduce the analysis.
 
-## Workflow
-
-### 1. Data collection
-
-`01_data_collection.ipynb` downloads or reads the required NHANES component files, selects the variables used in the project, and merges participant-level records.
-
-### 2. Data preprocessing
-
-`02_data_preprocessing.ipynb` cleans and recodes the variables, creates derived lifestyle features and the binary target, validates the final dataset, and saves analysis-ready outputs.
-
-### 3. Exploratory data analysis
-
-`03_exploratory_data_analysis.ipynb` examines target prevalence, continuous-feature distributions, group differences, categorical elevated-risk rates, correlations, and multicollinearity.
-
-### 4. Model development
-
-`04_model_development.ipynb` performs the stratified split, constructs leakage-safe preprocessing pipelines, compares models, tunes hyperparameters, evaluates correlated-feature configurations, selects a probability threshold from out-of-fold predictions, evaluates the untouched test set, and saves the final artifacts.
-
-### 5. Deployment
-
-`app.py` loads the saved pipeline and metadata, collects the 27 required inputs, produces a probability score, and compares it with the selected screening threshold.
-
-## Run the Application Locally
-
-Clone the repository:
+## Run Locally
 
 ```bash
 git clone https://github.com/sibelsezen/nhanes-depression-risk-prediction.git
 cd nhanes-depression-risk-prediction
-```
-
-Create and activate a virtual environment:
-
-```bash
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-Install the dependencies and start Streamlit:
-
-```bash
+python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
 python3 -m streamlit run app.py
 ```
 
+The application loads the complete saved pipeline, gathers all 29 inputs, calculates the positive-class probability, and applies the saved threshold of 0.4125.
+
+## AWS Deployment
+
+The application is deployed on an Ubuntu AWS EC2 instance and managed by `systemd`, which starts Streamlit automatically and restarts it after a failure or server reboot.
+
+See [deployment/README.md](deployment/README.md) for the complete reproducible deployment procedure and [deployment/nhanes-streamlit.service](deployment/nhanes-streamlit.service) for the service definition.
+
+The current endpoint uses an EC2 public IP. For a permanent production URL, use an Elastic IP or domain name and place Nginx with HTTPS in front of Streamlit.
+
 ## Key Technical Decisions
 
-- Used a stratified 80/20 train–test split to preserve class proportions.
-- Kept all preprocessing inside scikit-learn pipelines to reduce leakage risk.
-- Used five-fold stratified cross-validation on the training data.
-- Applied class balancing to address the minority positive class.
-- Used out-of-fold probabilities for threshold selection.
-- Reserved the test set for a single final evaluation.
-- Saved the complete fitted pipeline so deployment uses the same transformations as training.
+- Recall is the primary selection metric because false negatives are costly in screening.
+- ROC-AUC is the secondary metric because it evaluates ranking across all possible thresholds.
+- PR-AUC is retained as a diagnostic metric because the positive class is uncommon.
+- Ordinary accuracy is excluded from model selection.
+- Thresholds are learned from out-of-fold training probabilities, never from the test set.
+- The final test set is evaluated only once.
+- The complete fitted preprocessing-and-model pipeline is saved so deployment uses the same transformations as training.
 
 ## Limitations
 
-- The data are cross-sectional, so the model identifies associations rather than causal relationships.
-- The model was internally evaluated on one NHANES cycle and has not been externally or clinically validated.
-- Self-reported survey responses may contain recall or reporting bias.
-- The positive class is relatively uncommon, which limits precision.
-- Performance may not generalize to other populations, time periods, or data-collection settings.
-- The output is a statistical screening score, not a diagnosis or treatment recommendation.
-
-## Ethical Use
-
-Mental-health predictions require careful interpretation. This application should not replace the PHQ-9, a clinician, or emergency and crisis services. A high score should not be treated as proof of depression, and a low score does not rule it out. The model should be viewed only as an educational demonstration of an end-to-end data-science workflow.
+- NHANES data are cross-sectional; the model identifies associations, not causes.
+- The model has internal evaluation on one NHANES cycle but no external or clinical validation.
+- Survey responses may contain recall or reporting bias.
+- Low positive-class prevalence limits precision.
+- Results may not generalize to other populations or data-collection settings.
+- The AWS endpoint is a demonstration deployment and may change unless an Elastic IP is assigned.
+- A risk score is not a diagnosis and must not replace professional assessment.
 
 ## Technology Stack
 
-- Python
-- pandas and NumPy
-- scikit-learn
-- Matplotlib and Seaborn
-- Jupyter Notebook
-- joblib
-- Streamlit
-- Git and GitHub
+Python, pandas, NumPy, scikit-learn, imbalanced-learn, XGBoost, CatBoost, LightGBM, Jupyter Notebook, joblib, Streamlit, Git/GitHub, and AWS EC2.
 
 ## Author
 
