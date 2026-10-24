@@ -1,11 +1,11 @@
-rank,model,threshold,balanced_accuracy,precision,recall,specificity,f1,f2,roc_auc,oof_pr_auc,cv_pr_auc,cv_std,overfitting_gap
-1,CatBoost,0.0968,0.7483,0.223,0.7602,0.7364,0.3449,0.5131,0.8117,0.2924,0.3035,0.0259,0.0445
-2,Logistic Regression,0.4369,0.7475,0.2124,0.7847,0.7103,0.3343,0.5099,0.8082,0.2961,0.303,0.0259,0.0265
-3,Gradient Boosting,0.3154,0.747,0.2442,0.7139,0.78,0.3639,0.5155,0.8124,0.2934,0.3021,0.0295,0.0285
-4,Random Forest,0.5097,0.735,0.2398,0.6866,0.7833,0.3554,0.5002,0.8068,0.293,0.3019,0.0336,0.0446
-5,Support Vector Machine,0.1278,0.7422,0.2684,0.6649,0.8196,0.3824,0.5133,0.8121,0.294,0.3016,0.0258,0.0407
-6,XGBoost,0.3873,0.74,0.2538,0.6785,0.8015,0.3694,0.5084,0.8084,0.2834,0.2977,0.0335,0.015
-7,LightGBM,0.447,0.7433,0.2067,0.7875,0.6992,0.3275,0.5042,0.8051,0.2791,0.2954,0.0358,0.025
-8,Histogram Gradient Boosting,0.4138,0.7395,0.1924,0.8229,0.6561,0.3118,0.497,0.8012,0.2775,0.2865,0.0301,0.0101
-9,Decision Tree,0.542,0.7195,0.1907,0.7602,0.6789,0.3049,0.4759,0.7631,0.2424,0.2388,0.028,0.0094
-10,AdaBoost,0.3504,0.7348,0.197,0.7902,0.6794,0.3154,0.4932,0.7834,0.2273,0.2346,0.0312,0.0376
+rank,model,configuration,threshold,recall,roc_auc,specificity,balanced_accuracy,precision,f1,f2,pr_auc,passes_guardrails,overfitting_status
+1,Logistic Regression,Tuned + class weight,0.4125,0.8038,0.8077,0.6922,0.7480,0.2063,0.3283,0.5090,0.2955,True,No meaningful overfitting
+2,AdaBoost,Tuned + class weight,0.3504,0.7902,0.7834,0.6794,0.7348,0.1970,0.3154,0.4932,0.2273,True,No meaningful overfitting
+3,CatBoost,Regularized + class weight,0.4762,0.7766,0.8122,0.7244,0.7505,0.2191,0.3417,0.5146,0.2964,True,No meaningful overfitting
+4,XGBoost,Regularized + class weight,0.4624,0.7711,0.8093,0.7282,0.7497,0.2202,0.3426,0.5140,0.2935,True,No meaningful overfitting
+5,Random Forest,Tuned + class weight,0.4642,0.7520,0.8096,0.7274,0.7397,0.2155,0.3350,0.5020,0.2956,True,Possible overfitting
+6,Histogram Gradient Boosting,Regularized + class weight,0.5269,0.7330,0.8092,0.7735,0.7532,0.2437,0.3657,0.5229,0.2914,True,No meaningful overfitting
+7,LightGBM,Regularized + class weight,0.5058,0.7302,0.8101,0.7719,0.7511,0.2417,0.3631,0.5200,0.2897,True,No meaningful overfitting
+8,Decision Tree,Tuned + class weight,0.3378,0.7275,0.7678,0.6838,0.7056,0.1863,0.2967,0.4602,0.2456,True,No meaningful overfitting
+9,Support Vector Machine,Tuned + class weight,0.1030,0.7166,0.8070,0.7695,0.7430,0.2363,0.3554,0.5095,0.2916,True,No meaningful overfitting
+10,Gradient Boosting,Tuned + regularization,0.1116,0.6921,0.8101,0.7876,0.7399,0.2449,0.3618,0.5070,0.2930,True,No meaningful overfitting
