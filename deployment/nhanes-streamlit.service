@@ -1,0 +1,16 @@
+[Unit]
+Description=NHANES Depression Risk Streamlit App
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/nhanes-depression-risk-prediction
+Environment="PATH=/home/ubuntu/nhanes-depression-risk-prediction/.venv/bin"
+ExecStart=/home/ubuntu/nhanes-depression-risk-prediction/.venv/bin/streamlit run app.py --server.address=0.0.0.0 --server.port=8501 --server.headless=true
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
