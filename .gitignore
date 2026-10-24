@@ -237,3 +237,9 @@ data/processed/*
 # Keep folder placeholders
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+
+# Private keys and cloud credentials
+*.pem
+*.key
+*.ppk
+.aws/
